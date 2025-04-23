@@ -1,0 +1,5 @@
+chroma_db/
+data/
+.env
+conversation_history.json
+.venv/
