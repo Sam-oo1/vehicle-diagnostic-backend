@@ -84,7 +84,7 @@ class DiagnosticFlow:
         # Initial state with user query
         state = {"user_query": user_query}
         
-        # Step 1: Intent Recognition
+        # Intent Recognition
         intent_state = self.intent_agent.process(state)
         state.update(intent_state)
         
