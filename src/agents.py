@@ -90,7 +90,7 @@ class QueryRefinementAgent(Agent):
         if intent == "modify_previous":
             return {"refined_query": user_query}
         
-        prompt = f"""You are a vehicle diagnostic expert. Refine the following vehicle diagnostic query to make it specific, structured, and clear for troubleshooting:
+        prompt = f"""You are a vehicle diagnostic expert. Refine the following vehicle diagnostic user query to make it specific, structured, and clear for troubleshooting:
         
         "{user_query}"
         
@@ -100,6 +100,7 @@ class QueryRefinementAgent(Agent):
         2. Relevant vehicle information (if provided)
         3. Any potential causes the user might be concerned about
         4. Clear questions about diagnosis or repair options
+        5. If the querry is irrespective of any car give general response that is car agnostic.
         
         Return ONLY the refined version of the query.
         """
@@ -155,7 +156,7 @@ class InformationGatheringAgent(Agent):
         # Get internal documents
         try:
             retrieved_docs = self.doc_store.retrieve(refined_query)
-            print("\n✓ Internal documents retrieved")
+            print("\n✓ Internal documents retrieved ")
         except Exception as e:
             print(f"Error in document retrieval: {e}")
             retrieved_docs = "No internal documents available."
@@ -181,20 +182,22 @@ class DiagnosticAgent(Agent):
         internal_documents = input_data.get("internal_documents", "")
         
         prompt = f"""
-        You are an expert car diagnostic assistant who is assisting an expert car mechanic or technician in their work.
-        
+        You are an **BMW expert car diagnostic assistant** who is assisting an expert car mechanic or technician in their work.
+        my car suite only includes BMW cars if you encounter any other car brand, simply return a response saying you only cater to BMW cars.
+        You know nothing about other cars or car brands and if you need any eg. for the query to propose use model name as **BMW X1** or **X2** or **X3**.
+        And the Internal document i am providng you is the data from forums of BMW bimmers and other specific models. So you only need to 
+
         User query:
         {refined_query}
         
         Search result:
         {search_results}
         
-        Internal documents:
+        **only diagnose the data based on these Retrieval Output and this output is from my RAG:**:
         {internal_documents}
         
         Based on all this information, provide a clear and helpful diagnostic response.
         """
-        
         try:
             response = self.llm.invoke(prompt)
             diagnostic_response = response.content
@@ -221,12 +224,15 @@ class ReasoningAgent(Agent):
         internal_documents = input_data.get("internal_documents", "")
         
         prompt = f"""
-        You are an expert vehicle diagnostics analyst and an expert mechanic and vehicle technician.
-
+        You are an BMW expert vehicle diagnostics analyst and an expert mechanic and vehicle technician.
+        my car suite only includes BMW cars if you encounter any other car brand, simply return a response saying you only cater to BMW cars.
+        You know nothing about other cars or car brands. 
+        And the Internal document i am providng you is the data from forums of BMW bimmers and other specific models. So you only need to give the response based on the Retrieval Output from my RAG
+        the retrieval output is data and my vehicle is BMW X1 dont use **HONDA civic**
         Analyze the diagnostic response based on the original user query and available supporting information.
 
         Query: {refined_query}
-        
+
         LLM Response: {diagnostic_response}
         
         Web Search Output: {search_results}
@@ -254,7 +260,7 @@ class ReasoningAgent(Agent):
         try:
             response = self.llm.invoke(prompt)
             reasoning_feedback = response.content
-            print("\n✓ Response evaluation completed")
+            print("\n✓ Response evaluation completed of reasoning agent")
             return {"reasoning_feedback": reasoning_feedback}
         except Exception as e:
             print(f"Error in reasoning: {e}")
@@ -333,6 +339,7 @@ class ResponseFormulationAgent(Agent):
         Make it sound human and informative and don't make it much longer, keep it in appropriate length so that it is not boring to read but covers all necessary things.
                                                         
         Give the Response in strictly markdown format and the response should be around 200 to 300 words.
+        The Markdown format should follow hierarchial headings and body text format.
         """)
     
     def _format_chat_history(self) -> str:

@@ -155,6 +155,7 @@ class DiagnosticFlow:
             else:
                 # Normal flow for new questions
                 response = self._process_standard_flow(state)
+                
             
             return {
                 "response": response,
@@ -292,7 +293,7 @@ def create_api():
                 enable_pdf_processing=enable_pdf_processing,
                 pdf_content=pdf_content
             )
-            
+            logger.info(f"Final Answer {jsonify(result)}")
             return jsonify(result)
             
         except Exception as e:
@@ -312,7 +313,7 @@ def create_api():
             logger.exception(f"Error clearing history: {e}")
             return jsonify({
                 'error': str(e),
-                'status': 'error'
+                'status': 'error'   
             }), 500
     
     return app

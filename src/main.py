@@ -33,9 +33,11 @@ class DiagnosticFlow:
         # Initialize LLM
         genai.configure(api_key=os.getenv("GOOGLE_API_KEY"))
         self.llm = ChatGoogleGenerativeAI(
-            model="gemini-2.0-flash-001",
+            model="gemini-2.0-flash",
             temperature=0,
-            max_retries=2
+            max_retries=2,
+            top_p=0.9,          
+            top_k=50
         )
         
         # Initialize document store
