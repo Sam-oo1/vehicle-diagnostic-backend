@@ -331,6 +331,8 @@ class ResponseFormulationAgent(Agent):
         - Maintains continuity with previous conversation (if relevant)
 
         Make it sound human and informative and don't make it much longer, keep it in appropriate length so that it is not boring to read but covers all necessary things.
+                                                        
+        Give the Response in strictly markdown format and the response should be around 200 to 300 words.
         """)
     
     def _format_chat_history(self) -> str:
